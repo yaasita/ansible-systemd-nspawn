@@ -1,0 +1,28 @@
+---
+
+- name: apt-get update
+  action: apt update_cache=yes cache_valid_time=86400
+
+- name: 必要パッケージインストール
+  apt: pkg={{ item }} state=installed
+  with_items:
+    - systemd-container
+    - bridge-utils
+    - debootstrap
+
+- name: systemd-networkd設定ファイル配置
+  copy: src={{ item }} dest=/etc/systemd/network/{{ item }} mode=0644
+  with_items:
+    - br.network
+    - bridge.netdev
+    - eth0.network
+
+- name: enable systemd-networkd
+  systemd:
+    name: systemd-networkd.service
+    enabled: yes
+
+- name: 転送設定
+  copy: src=iptables dest=/etc/network/if-pre-up.d/iptables mode=0755
+- copy: src=sysctl.conf dest=/etc/sysctl.conf mode=0644
+- copy: src=systemd-nspawn@.service dest=/etc/systemd/system/systemd-nspawn@.service

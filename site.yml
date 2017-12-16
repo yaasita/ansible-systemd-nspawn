@@ -1,0 +1,6 @@
+---
+- name: ansible-systemd-nspawn
+  hosts: localhost
+  become: yes
+  roles:
+    - nspawn
